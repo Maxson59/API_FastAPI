@@ -9,4 +9,3 @@ class TicketSchema(BaseModel):
     price: float
     transaction_counter: int
     owner: int
-

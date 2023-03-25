@@ -102,3 +102,27 @@ def get_user(user_id: str):
 
         return result
 
+
+
+# TRANSCATION 
+@user.put("/api/user/{user_id}/{code}")
+def transaction(user_id: int, code: str):
+    with engine.connect() as conn:
+        ticket = conn.execute(tickets.select().where(tickets.c.code == code)).first()
+        if ticket != None:
+            counter = ticket["transaction_counter"]
+            if counter < 3:
+                result = conn.execute(tickets.update().values(owner = user_id, transaction_counter = counter + 1).where(tickets.c.code == code))
+                return result
+            else:
+                return {
+                    "status": "Error",
+                    "message": "More than 3 transaccions with this ticket",
+                }
+        else:
+            return {
+                "status": "Error",
+                "message": "Code does not exist",
+            }
+        
+        
